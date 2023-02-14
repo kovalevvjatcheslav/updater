@@ -1,14 +1,10 @@
 package types
 
-type Header struct {
-	cols []string
-}
-
 type Row struct {
-	cols []string
+	Cols []string
 }
 
 type Table struct {
-	header Header
-	rows   []Row
+	Header Row
+	Rows   []Row
 }
