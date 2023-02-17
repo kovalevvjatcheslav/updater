@@ -5,11 +5,13 @@ import (
 	"log"
 	"updater/types"
 
+	"golang.org/x/net/html"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ParseHtml(r io.Reader) types.Table {
-	doc, err := goquery.NewDocumentFromReader(r)
+func ParseHtml(data io.Reader) types.Table {
+	doc, err := goquery.NewDocumentFromReader(data)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,9 +46,25 @@ func addBody(table *types.Table, i int, tbody *goquery.Selection) {
 		tbody.Find("tr").Each(func(i int, tr *goquery.Selection) {
 			cols := []string{}
 			tr.Find("td").Each(func(i int, td *goquery.Selection) {
-				cols = append(cols, td.Text())
+				cols = append(cols, buildText(td.Nodes[0].FirstChild))
 			})
 			table.Rows = append(table.Rows, types.Row{Cols: cols})
 		})
 	}
+}
+
+func buildText(elem *html.Node) string {
+	if elem == nil {
+		return ""
+	} else if elem.Type == html.TextNode {
+		return elem.Data + buildText(elem.NextSibling)
+	} else if elem.Data == "p" {
+		return buildText(elem.FirstChild) + "\n" + buildText(elem.NextSibling)
+	} else if elem.Data == "ul" || elem.Data == "span" || elem.Data == "code" {
+		return buildText(elem.FirstChild) + buildText(elem.NextSibling)
+	} else if elem.Data == "li" {
+		return "\t-" + buildText(elem.FirstChild) + "\n" + buildText(elem.NextSibling)
+	}
+
+	return ""
 }

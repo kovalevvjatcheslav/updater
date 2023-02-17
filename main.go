@@ -1,29 +1,29 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 	"os"
-	_ "updater/types"
 	"updater/utils"
 )
 
 func main() {
-	file_path := "fixtures/Коды ответа API - Документация Подсказок - Confluence.html"
-	file, err := os.Open(file_path)
-	if err != nil {
-		log.Fatalf("Cannot open file %s", file_path)
-	}
-	defer file.Close()
-	test_table := utils.ParseHtml(file)
-
-	if len(os.Args[1:]) < 2 {
+	if len(os.Args[1:]) < 3 {
 		log.Fatal("Not enough arguments passed")
 	}
-	path_to_secret := os.Args[1]
-	doc_id := os.Args[2]
-	fmt.Println(path_to_secret, doc_id)
+	url_conf_doc := os.Args[1]
+	path_to_secret := os.Args[2]
+	doc_id := os.Args[3]
 
-	utils.UpdateDoc(path_to_secret, doc_id, &test_table)
+	res, err := http.Get(url_conf_doc)
+	defer res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+	table := utils.ParseHtml(res.Body)
 
+	utils.UpdateDoc(path_to_secret, doc_id, &table)
 }
