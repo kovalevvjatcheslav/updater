@@ -28,9 +28,11 @@ func ParseHtml(r io.Reader) types.Table {
 func addHeader(table *types.Table, i int, thead *goquery.Selection) bool {
 	style, _ := thead.Attr("style")
 	if style != "display: none;" {
+		cols := []string{}
 		thead.Find("th").Each(func(i int, th *goquery.Selection) {
-			table.Header.Cols = append(table.Header.Cols, th.Text())
+			cols = append(cols, th.Text())
 		})
+		table.Rows = append(table.Rows, types.Row{Cols: cols})
 		return false
 	}
 	return true

@@ -5,6 +5,5 @@ type Row struct {
 }
 
 type Table struct {
-	Header Row
-	Rows   []Row
+	Rows []Row
 }

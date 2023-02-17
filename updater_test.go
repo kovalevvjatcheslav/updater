@@ -16,8 +16,8 @@ func TestParseHtml(t *testing.T) {
 	}
 	defer file.Close()
 	expected_table := types.Table{}
-	expected_table.Header = types.Row{Cols: []string{"HTTP-код ответа", "Описание"}}
 	expected_table.Rows = []types.Row{
+		{Cols: []string{"HTTP-код ответа", "Описание"}},
 		{Cols: []string{"200", "Запрос успешно обработан"}},
 		{Cols: []string{"400", "Некорректный запрос (невалидный JSON или XML)"}},
 		{Cols: []string{"405", "Запрос сделан с методом, отличным от GET или POST"}},
